@@ -1,17 +1,20 @@
 <?php
 namespace App\Services;
 
+use App\Interfaces\SmsDriverInterface;
 use App\Models\Customer;
 use App\Models\Order;
-use App\Services\SmsDrivers\SmsLoadBalancer;
+use App\Services\SmsDrivers\SmsDriverFactory;
+
 
 class OrderService
 {
-    protected SmsLoadBalancer $smsLoadBalancer;
+    protected SmsDriverInterface $smsDriver;
 
-    public function __construct(SmsLoadBalancer $smsLoadBalancer)
+    public function __construct(SmsDriverFactory $smsFactory)
     {
-        $this->smsLoadBalancer = $smsLoadBalancer;
+        $driver = config('sms.sms_driver', 'loadBalancer');
+        $this->smsDriver = $smsFactory->create($driver);
     }
 
     public function register($params)
@@ -33,7 +36,7 @@ class OrderService
 
         $message = "Dear {$customer->name},\nYour order has been registered successfully.\nThank you.";
 
-        $this->smsLoadBalancer->sendSms($customer->mobile, $message);
+        $this->smsDriver->sendSms($customer->mobile, $message);
 
         return ['data' => ['message' => 'Order registered successfully.'],'httpStatusCode' => 200];
     }

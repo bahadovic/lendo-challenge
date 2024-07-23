@@ -2,6 +2,9 @@
 
 return [
 
+    'sms_driver' => env('SMS_DRIVER', 'loadBalancer'),
+
+
     'SmsA' => [
         'endpoint' => env('SMS_A_END_POINT', ''),
         'username' => env('SMS_A_USERNAME', ''),
