@@ -19,15 +19,16 @@ class OrderService
         $this->smsDriver = $smsFactory->create($driver);
     }
 
-    /**
-     * @throws \Exception
-     */
     public function register($params)
     {
         $customer = Customer::find($params['customer_id']);
 
         if ($customer->status == CustomerStatus::Blocked || !$customer->complete_info) {
-            throw new \Exception('Customer is not eligible to place an order.');
+            return [
+                'success' => false,
+                'message' => 'Customer is not eligible to place an order.',
+                'httpStatusCode' => '400'
+            ];
         }
 
         $orderStatus = $customer->bank_account_number ? OrderStatus::CheckHavingAccount : OrderStatus::OpeningBankAccount;
@@ -43,6 +44,11 @@ class OrderService
 
         $this->smsDriver->sendSms($customer->mobile, $message);
 
-        return $order;
+        return [
+            'success' => true,
+            'message' => 'Order registered successfully',
+            'data' => $order,
+            'httpStatusCode' => '200'
+        ];
     }
 }

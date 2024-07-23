@@ -16,13 +16,12 @@ class OrderController extends Controller
     }
     public function register(OrderRequest $request)
     {
-        try {
-            $order = $this->service->register($request->validated()->toAraay());
-            return $this->responseFormatter->success($order, 'Order registered successfully');
-        } catch (ValidationException $e) {
-            return $this->responseFormatter->error('Validation failed', 422, $e->errors());
-        } catch (\Exception $e) {
-            return $this->responseFormatter->error($e->getMessage(), 400);
+        $result = $this->service->register($request->validated()->toArray());
+
+        if (!$result['success']) {
+            return $this->responseFormatter->error($result['message'], $result['httpStatusCode'], $result['errors'] ?? null);
         }
+
+        return $this->responseFormatter->success($result['data'], $result['message'], $result['httpStatusCode']);
     }
 }
