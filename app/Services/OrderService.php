@@ -1,6 +1,8 @@
 <?php
 namespace App\Services;
 
+use App\Enums\CustomerStatus;
+use App\Enums\OrderStatus;
 use App\Interfaces\SmsDriverInterface;
 use App\Models\Customer;
 use App\Models\Order;
@@ -21,11 +23,11 @@ class OrderService
     {
         $customer = Customer::find($params['customer_id']);
 
-        if ($customer->status == 'blocked' || !$customer->complete_info) {
+        if ($customer->status == CustomerStatus::Blocked || !$customer->complete_info) {
             return ['data' => ['message' => 'Customer is not eligible to place an order.'], 'httpStatusCode' => 400];
         }
 
-        $orderStatus = $customer->bank_account_number ? 'CHECK_HAVING_ACCOUNT' : 'OPENING_BANK_ACCOUNT';
+        $orderStatus = $customer->bank_account_number ? OrderStatus::CheckHavingAccount : OrderStatus::OpeningBankAccount;
 
         Order::create([
             'customer_id' => $params['customer_id'],

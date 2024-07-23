@@ -10,11 +10,12 @@ return new class extends Migration {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
             $table->string('bank_account_number')->nullable();
-            $table->enum('status', ['normal', 'blocked']);
+            $table->string('status');
             $table->boolean('complete_info');
             $table->string('mobile');
             $table->string('name');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

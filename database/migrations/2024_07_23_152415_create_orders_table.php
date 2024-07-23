@@ -9,11 +9,12 @@ return new class extends Migration {
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
+            $table->foreignId('customer_id')->constrained();
             $table->integer('amount');
             $table->integer('invoice_count');
-            $table->enum('status', ['CHECK_HAVING_ACCOUNT', 'OPENING_BANK_ACCOUNT']);
+            $table->string('status');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
