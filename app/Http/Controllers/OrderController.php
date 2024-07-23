@@ -3,23 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OrderRequest;
-use App\Models\Customer;
-use App\Models\Order;
 use App\Services\OrderService;
-use App\Services\SmsDrivers\SmsLoadBalancer;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use App\Services\ResponseFormatter;
+use Illuminate\Validation\ValidationException;
 
 class OrderController extends Controller
 {
     public function __construct(
-        private readonly OrderService $service
+        private readonly OrderService $service,private readonly ResponseFormatter $responseFormatter
     )
     {
     }
     public function register(OrderRequest $request)
     {
-        $data = $this->service->register(params: $request->safe()->toArray());
-        return response()->json(data: $data['data'], status: $data['httpStatusCode']);
+        try {
+            $order = $this->service->register($request->validated()->toAraay());
+            return $this->responseFormatter->success($order, 'Order registered successfully');
+        } catch (ValidationException $e) {
+            return $this->responseFormatter->error('Validation failed', 422, $e->errors());
+        } catch (\Exception $e) {
+            return $this->responseFormatter->error($e->getMessage(), 400);
+        }
     }
 }

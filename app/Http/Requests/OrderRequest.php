@@ -15,8 +15,21 @@ class OrderRequest extends FormRequest
         ];
     }
 
+    public function messages()
+    {
+        return [
+            'customer_id.required' => 'The customer ID is required.',
+            'customer_id.exists' => 'The selected customer ID is invalid.',
+            'amount.required' => 'The amount is required.',
+            'amount.in' => 'The selected amount is invalid.',
+            'invoice_count.required' => 'The invoice count is required.',
+            'invoice_count.in' => 'The selected invoice count is invalid.',
+        ];
+    }
+
     public function authorize()
     {
         return true;
     }
+
 }
